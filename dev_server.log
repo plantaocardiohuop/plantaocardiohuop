@@ -1,0 +1,104 @@
+
+> rotary-attendance@0.1.0 dev
+> next dev
+
+▲ Next.js 16.3.8 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 846ms
+✓ Running next.config.ts took 48ms
+
+ GET / 200 in 3.3s (next.js: 2.9s, application-code: 346ms)
+ GET /admin 200 in 618ms (next.js: 515ms, application-code: 103ms)
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+      <LoadingBoundary name="admin/" loading={null}>
+        <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+          <RedirectBoundary>
+            <RedirectErrorBoundary router={{...}}>
+              <InnerLayoutRouter url="/admin" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+                <SegmentViewNode type="page" pagePath="src/admin/...">
+                  <SegmentTrieNode>
+                  <Admin>
+                    <main className="min-h-scre...">
+                      <div className="max-w-4xl ...">
+                        <div>
+                        <div className="grid grid-...">
+                          <div className="bg-white p...">
+                            <h2>
+                            <form action={function addMember} className="space-y-4">
+                              <div>
+                                <label>
+                                <input
+                                  type="text"
+                                  name="name"
+                                  id="name"
+                                  required={true}
+                                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-..."
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              ...
+                          <div className="bg-white p...">
+                            <h2>
+                            <form action={function action} className="space-y-4">
+                              <div>
+                              <div>
+                                <label>
+                                <input
+                                  type="text"
+                                  name="meetingName"
+                                  id="meetingName"
+                                  placeholder="Reunião do Rotary"
+                                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-..."
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              ...
+                          <div className="bg-white p...">
+                            <h2>
+                            <form action={function action} className="space-y-4 ...">
+                              <div>
+                              <div className="md:col-span-1">
+                                <label>
+                                <input
+                                  type="number"
+                                  name="amount"
+                                  id="amount"
+                                  required={true}
+                                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-..."
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              <div className="md:col-span-1">
+                                <label>
+                                <input
+                                  type="text"
+                                  name="reason"
+                                  id="reason"
+                                  required={true}
+                                  placeholder="Ex: Doação"
+                                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-..."
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              ...
+                          ...
+                ...
+              ...
+
+ POST /admin 200 in 99ms (next.js: 4ms, application-code: 95ms)
+  └─ ƒ addMember({}) in 10ms src/actions.ts
+ POST /admin 200 in 57ms (next.js: 4ms, application-code: 53ms)
+  └─ ƒ <inline action>({}) in 13ms src/admin/page.tsx
+ POST /admin 200 in 55ms (next.js: 5ms, application-code: 50ms)
+  └─ ƒ <inline action>({}) in 8ms src/admin/page.tsx
+ GET / 200 in 60ms (next.js: 4ms, application-code: 56ms)
