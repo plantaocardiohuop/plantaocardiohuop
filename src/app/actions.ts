@@ -6,72 +6,116 @@ import { revalidatePath } from 'next/cache'
 const prisma = new PrismaClient()
 
 export async function addMember(formData: FormData) {
-  const name = formData.get('name') as string
-  if (!name) return
+  try {
+    const name = formData.get('name') as string
+    if (!name || typeof name !== 'string' || name.trim().length === 0 || name.length > 255) {
+      return { error: 'Invalid name provided' }
+    }
 
-  await prisma.member.create({
-    data: {
-      name,
-      points: 0,
-    },
-  })
+    await prisma.member.create({
+      data: {
+        name: name.trim(),
+        points: 0,
+      },
+    })
 
-  revalidatePath('/')
-  revalidatePath('/admin')
+    revalidatePath('/')
+    revalidatePath('/admin')
+  } catch (error) {
+    console.error('Operation failed: addMember', error instanceof Error ? error.message : 'Unknown error')
+    return { error: 'An error occurred while adding the member' }
+  }
 }
 
 export async function recordAttendance(memberId: number, meetingName: string = "Reunião do Rotary") {
-  const points = 10; // 10 points for attending a meeting
+  try {
+    if (!memberId || typeof memberId !== 'number' || memberId <= 0) {
+      return { error: 'Invalid member ID' }
+    }
 
-  await prisma.$transaction([
-    prisma.pointTransaction.create({
-      data: {
-        memberId,
-        amount: points,
-        reason: `Presença: ${meetingName}`,
-      }
-    }),
-    prisma.member.update({
-      where: { id: memberId },
-      data: { points: { increment: points } }
-    })
-  ]);
+    if (typeof meetingName !== 'string' || meetingName.length > 255) {
+      return { error: 'Invalid meeting name' }
+    }
 
-  revalidatePath('/')
-  revalidatePath('/admin')
+    const points = 10; // 10 points for attending a meeting
+
+    await prisma.$transaction([
+      prisma.pointTransaction.create({
+        data: {
+          memberId,
+          amount: points,
+          reason: `Presença: ${meetingName.trim()}`,
+        }
+      }),
+      prisma.member.update({
+        where: { id: memberId },
+        data: { points: { increment: points } }
+      })
+    ]);
+
+    revalidatePath('/')
+    revalidatePath('/admin')
+  } catch (error) {
+    console.error('Operation failed: recordAttendance', error instanceof Error ? error.message : 'Unknown error')
+    return { error: 'An error occurred while recording attendance' }
+  }
 }
 
 export async function addBonusPoints(memberId: number, amount: number, reason: string) {
-  if (!amount || !reason) return;
+  try {
+    if (!memberId || typeof memberId !== 'number' || memberId <= 0) {
+      return { error: 'Invalid member ID' }
+    }
 
-  await prisma.$transaction([
-    prisma.pointTransaction.create({
-      data: {
-        memberId,
-        amount,
-        reason,
-      }
-    }),
-    prisma.member.update({
-      where: { id: memberId },
-      data: { points: { increment: amount } }
-    })
-  ]);
+    if (!amount || typeof amount !== 'number' || amount <= 0 || amount > 100000) {
+      return { error: 'Invalid amount' }
+    }
 
-  revalidatePath('/')
-  revalidatePath('/admin')
+    if (!reason || typeof reason !== 'string' || reason.trim().length === 0 || reason.length > 255) {
+      return { error: 'Invalid reason' }
+    }
+
+    await prisma.$transaction([
+      prisma.pointTransaction.create({
+        data: {
+          memberId,
+          amount,
+          reason: reason.trim(),
+        }
+      }),
+      prisma.member.update({
+        where: { id: memberId },
+        data: { points: { increment: amount } }
+      })
+    ]);
+
+    revalidatePath('/')
+    revalidatePath('/admin')
+  } catch (error) {
+    console.error('Operation failed: addBonusPoints', error instanceof Error ? error.message : 'Unknown error')
+    return { error: 'An error occurred while adding bonus points' }
+  }
 }
 
 export async function deleteMember(memberId: number) {
-  await prisma.$transaction([
-    prisma.pointTransaction.deleteMany({
-      where: { memberId }
-    }),
-    prisma.member.delete({
-      where: { id: memberId }
-    })
-  ]);
+  try {
+    if (!memberId || typeof memberId !== 'number' || memberId <= 0) {
+      return { error: 'Invalid member ID' }
+    }
 
-  revalidatePath('/')
-  revalidatePath('/admin')
+    await prisma.$transaction([
+      prisma.pointTransaction.deleteMany({
+        where: { memberId }
+      }),
+      prisma.member.delete({
+        where: { id: memberId }
+      })
+    ]);
+
+    revalidatePath('/')
+    revalidatePath('/admin')
+  } catch (error) {
+    console.error('Operation failed: deleteMember', error instanceof Error ? error.message : 'Unknown error')
+    return { error: 'An error occurred while deleting the member' }
+  }
 }
