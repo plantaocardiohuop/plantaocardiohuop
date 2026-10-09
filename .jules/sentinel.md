@@ -1,0 +1,4 @@
+## 2024-10-09 - Missing Input Validation and Error Handling in Server Actions
+**Vulnerability:** Next.js Server Actions lacked input bounds checking (e.g. string lengths, negative amounts) and did not catch exceptions from the database. This could allow DoS attacks via extremely large inputs, application state corruption via invalid inputs (negative points), and leaking of database structure or internal error details to the client through unhandled promise rejections.
+**Learning:** In Next.js, Server Actions are essentially public API endpoints. They must validate ALL inputs including type, boundaries, and length. They must also gracefully handle all internal errors securely.
+**Prevention:** Always validate all inputs in Server Actions using strong typings and boundary checks. Wrap all operations involving databases or external services in `try/catch` blocks, returning generic, safe error messages to the client.
