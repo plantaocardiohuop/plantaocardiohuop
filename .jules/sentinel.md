@@ -1,0 +1,4 @@
+## 2023-10-25 - [Missing Validation in Server Actions]
+**Vulnerability:** Next.js Server Actions were receiving input from forms without any validation (type, bounds, length) and were lacking try/catch wrappers, which could allow malicious users to inject malformed data, bypass client-side checks, or potentially trigger unhandled database errors that might leak stack traces.
+**Learning:** Next.js Server Actions act as public API endpoints and can be invoked with arbitrary payloads by a malicious client bypassing TypeScript. It is crucial to perform robust runtime validation on the server for all incoming data and securely handle exceptions.
+**Prevention:** Implement strict input validation (e.g., checking `typeof`, length limits, number bounds) for all Server Actions before performing database operations. Always wrap operations in `try/catch` blocks and return generic, safe error messages to the client instead of throwing raw errors.
