@@ -1,0 +1,4 @@
+## 2023-10-11 - Missing Input Validation and Error Handling in Server Actions
+**Vulnerability:** Next.js Server Actions were receiving raw input directly without type validation, bounds checking, or length limits. Furthermore, database operations were not wrapped in try/catch blocks, potentially allowing database-level errors to leak to the client or crash the server ungracefully.
+**Learning:** Server Actions can bypass route-level middleware and provide a direct entry point to the backend. We cannot assume data coming from the client is safe or structurally valid even if the client form requires it.
+**Prevention:** All Server Actions must strictly validate inputs (type, bounds, length, structure) and perform their own authorization. Any database interaction or business logic should be wrapped in a secure error boundary (try/catch) returning a safe, generic error message instead of raw error objects.
