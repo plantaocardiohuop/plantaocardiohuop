@@ -1,0 +1,4 @@
+## 2024-05-18 - Missing Server Action Input Validation and Error Handling
+**Vulnerability:** Next.js Server Actions lacked input validation (type, bounds, length checks) and error handling, allowing potentially malformed data to be passed to Prisma queries and exposing raw database errors or stack traces upon failure.
+**Learning:** Server Actions expose endpoints directly, acting similar to API routes. Without proper try/catch blocks, unhandled exceptions can leak sensitive internal state or database details. Without input validation, they are vulnerable to unexpected behaviors and potential exploitation.
+**Prevention:** Always implement strong input validation at the boundary of Server Actions. Wrap database operations and other logic in try/catch blocks, and return generic, user-friendly error messages rather than raw exceptions.

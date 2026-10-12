@@ -6,72 +6,125 @@ import { revalidatePath } from 'next/cache'
 const prisma = new PrismaClient()
 
 export async function addMember(formData: FormData) {
-  const name = formData.get('name') as string
-  if (!name) return
+  try {
+    const name = formData.get('name') as string
 
-  await prisma.member.create({
-    data: {
-      name,
-      points: 0,
-    },
-  })
+    // Security: Input validation
+    if (!name || typeof name !== 'string' || name.length > 255) {
+      return { error: 'Invalid name provided' }
+    }
 
-  revalidatePath('/')
-  revalidatePath('/admin')
+    await prisma.member.create({
+      data: {
+        name,
+        points: 0,
+      },
+    })
+
+    revalidatePath('/')
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (_error) {
+    // Security: Don't leak internal errors/stack traces
+    return { error: 'Failed to add member' }
+  }
 }
 
 export async function recordAttendance(memberId: number, meetingName: string = "Reunião do Rotary") {
-  const points = 10; // 10 points for attending a meeting
+  try {
+    // Security: Input validation
+    if (!memberId || !Number.isInteger(memberId) || memberId <= 0) {
+      return { error: 'Invalid member ID' }
+    }
 
-  await prisma.$transaction([
-    prisma.pointTransaction.create({
-      data: {
-        memberId,
-        amount: points,
-        reason: `Presença: ${meetingName}`,
-      }
-    }),
-    prisma.member.update({
-      where: { id: memberId },
-      data: { points: { increment: points } }
-    })
-  ]);
+    if (typeof meetingName !== 'string' || meetingName.length > 255) {
+      return { error: 'Invalid meeting name' }
+    }
 
-  revalidatePath('/')
-  revalidatePath('/admin')
+    const points = 10; // 10 points for attending a meeting
+
+    await prisma.$transaction([
+      prisma.pointTransaction.create({
+        data: {
+          memberId,
+          amount: points,
+          reason: `Presença: ${meetingName}`,
+        }
+      }),
+      prisma.member.update({
+        where: { id: memberId },
+        data: { points: { increment: points } }
+      })
+    ]);
+
+    revalidatePath('/')
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (_error) {
+    // Security: Don't leak internal errors/stack traces
+    return { error: 'Failed to record attendance' }
+  }
 }
 
 export async function addBonusPoints(memberId: number, amount: number, reason: string) {
-  if (!amount || !reason) return;
+  try {
+    // Security: Input validation
+    if (!memberId || !Number.isInteger(memberId) || memberId <= 0) {
+      return { error: 'Invalid member ID' }
+    }
 
-  await prisma.$transaction([
-    prisma.pointTransaction.create({
-      data: {
-        memberId,
-        amount,
-        reason,
-      }
-    }),
-    prisma.member.update({
-      where: { id: memberId },
-      data: { points: { increment: amount } }
-    })
-  ]);
+    if (typeof amount !== 'number' || !Number.isInteger(amount) || amount < -10000 || amount > 10000) {
+      return { error: 'Invalid amount' }
+    }
 
-  revalidatePath('/')
-  revalidatePath('/admin')
+    if (!reason || typeof reason !== 'string' || reason.length > 255) {
+      return { error: 'Invalid reason' }
+    }
+
+    await prisma.$transaction([
+      prisma.pointTransaction.create({
+        data: {
+          memberId,
+          amount,
+          reason,
+        }
+      }),
+      prisma.member.update({
+        where: { id: memberId },
+        data: { points: { increment: amount } }
+      })
+    ]);
+
+    revalidatePath('/')
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (_error) {
+    // Security: Don't leak internal errors/stack traces
+    return { error: 'Failed to add bonus points' }
+  }
 }
 
 export async function deleteMember(memberId: number) {
-  await prisma.$transaction([
-    prisma.pointTransaction.deleteMany({
-      where: { memberId }
-    }),
-    prisma.member.delete({
-      where: { id: memberId }
-    })
-  ]);
+  try {
+    // Security: Input validation
+    if (!memberId || !Number.isInteger(memberId) || memberId <= 0) {
+      return { error: 'Invalid member ID' }
+    }
 
-  revalidatePath('/')
-  revalidatePath('/admin')
+    await prisma.$transaction([
+      prisma.pointTransaction.deleteMany({
+        where: { memberId }
+      }),
+      prisma.member.delete({
+        where: { id: memberId }
+      })
+    ]);
+
+    revalidatePath('/')
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (_error) {
+    // Security: Don't leak internal errors/stack traces
+    return { error: 'Failed to delete member' }
+  }
 }
