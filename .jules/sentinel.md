@@ -1,0 +1,4 @@
+## 2024-10-15 - Unvalidated Input and Uncaught Exceptions in Next.js Server Actions
+**Vulnerability:** Next.js Server Actions in `src/app/actions.ts` did not validate incoming data (types, length, bounds) and lacked `try/catch` blocks.
+**Learning:** This exposes the application to Denial of Service (DoS) attacks via oversized strings, unexpected types causing crashes, and potential information leakage if Prisma throws an internal database error that gets passed back to the client. Next.js Server Actions bypass route-level middleware, making explicit validation and error handling at the action level crucial.
+**Prevention:** Always validate all inputs (type, bounds, length) at the beginning of every Server Action. Wrap the entire action logic in a `try/catch` block, log the actual error securely on the server, and return generic, user-friendly error messages to the client.
