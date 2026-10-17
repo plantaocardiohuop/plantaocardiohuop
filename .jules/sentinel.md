@@ -1,0 +1,4 @@
+## 2025-05-18 - Missing Input Validation and Error Handling in Server Actions
+**Vulnerability:** Next.js Server Actions (`src/app/actions.ts`) were missing `try/catch` blocks and robust input validation. This allowed invalid or out-of-bounds parameters (such as negative bonus amounts, which removed points) and potentially exposed raw internal database errors to the client application.
+**Learning:** Next.js Server Actions bypass route-level constraints and execute securely on the server but are directly reachable from the client. Without proper try/catch and input validation, database interactions can result in uncontrolled errors and unexpected application states.
+**Prevention:** Always wrap Next.js Server Action bodies inside `try/catch` blocks, return generic user-friendly errors on failure, and validate input parameters structurally (e.g. string lengths, number bounds).
