@@ -1,0 +1,4 @@
+## 2024-10-20 - Missing Server Action Input Validation and Error Bounds
+**Vulnerability:** The application exposed Server Actions (`addMember`, `recordAttendance`, `addBonusPoints`, `deleteMember`) that accepted user input from forms directly without validation, bounds checking, or string length limitations. These functions also lacked explicit error handling.
+**Learning:** Next.js Server Actions execute on the server and are essentially API endpoints. Failing to validate types (especially sizes/limits of strings) and not wrapping logic in try/catch bounds allows malformed data to crash the process, potentially resulting in raw error leakage to clients or database corruption.
+**Prevention:** Always implement strong bounds checking, typing validation, and wrap Prisma operations inside parameterless `catch { ... }` blocks to cleanly swallow errors and protect internal logic in Next.js Server Actions.
