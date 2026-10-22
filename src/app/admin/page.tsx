@@ -23,7 +23,10 @@ export default async function Admin() {
           {/* Add Member Form */}
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-bold mb-4 text-gray-900">Adicionar Membro</h2>
-            <form action={addMember} className="space-y-4">
+            <form action={async (formData) => {
+              'use server'
+              await addMember(formData);
+            }} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome</label>
                 <input type="text" name="name" id="name" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border" />
