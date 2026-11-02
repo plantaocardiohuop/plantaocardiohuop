@@ -1,0 +1,4 @@
+## 2024-11-02 - [CRITICAL] Next.js Server Actions Bypass Middleware Authentication
+**Vulnerability:** Next.js Server Actions were completely exposed because they bypassed the route-level middleware authentication. While the `/admin` page itself was protected, the underlying actions (like `addMember`, `deleteMember`, etc.) could be invoked directly by any user without authentication.
+**Learning:** In Next.js, Server Actions do not automatically run through standard route middleware. They must be explicitly protected with authentication checks within the action's execution context itself. Route-level middleware is insufficient for securing Server Actions.
+**Prevention:** Always implement explicit authentication and authorization checks (e.g., calling an `await requireAuth()` helper) at the very top of every Server Action function that performs privileged operations.
