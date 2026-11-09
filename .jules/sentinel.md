@@ -1,0 +1,4 @@
+## 2024-11-09 - Missing Authentication on Admin Endpoint and Server Actions
+**Vulnerability:** The application's `/admin` path and its associated Server Actions lacked authentication, allowing any user to add members, record attendance, award bonus points, and delete members. Additionally, Server Actions were found to bypass Next.js route-level middleware.
+**Learning:** Next.js Server Actions bypass `middleware.ts` protections when invoked, requiring explicit authorization checks within the action's logic itself. Adding authentication to the `/admin` path only protects the rendering of the admin UI, not the actions that perform state changes.
+**Prevention:** Always implement explicit authentication/authorization checks inside Server Action functions in addition to any path-level middleware protection. Also ensure paths with sensitive operations have basic authentication or proper session-based protection via middleware.
