@@ -2,10 +2,27 @@
 
 import { PrismaClient } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 
 const prisma = new PrismaClient()
 
+async function checkAuth() {
+  const adminPassword = process.env.ADMIN_PASSWORD
+  if (!adminPassword) throw new Error('Server configuration error')
+
+  const headersList = await headers()
+  const basicAuth = headersList.get('authorization')
+  if (!basicAuth) throw new Error('Unauthorized')
+
+  const authValue = basicAuth.split(' ')[1]
+  const decodedAuth = atob(authValue)
+  const [, password] = decodedAuth.split(':')
+
+  if (password !== adminPassword) throw new Error('Unauthorized')
+}
+
 export async function addMember(formData: FormData) {
+  await checkAuth()
   const name = formData.get('name') as string
   if (!name) return
 
@@ -21,6 +38,7 @@ export async function addMember(formData: FormData) {
 }
 
 export async function recordAttendance(memberId: number, meetingName: string = "Reunião do Rotary") {
+  await checkAuth()
   const points = 10; // 10 points for attending a meeting
 
   await prisma.$transaction([
@@ -42,6 +60,7 @@ export async function recordAttendance(memberId: number, meetingName: string = "
 }
 
 export async function addBonusPoints(memberId: number, amount: number, reason: string) {
+  await checkAuth()
   if (!amount || !reason) return;
 
   await prisma.$transaction([
@@ -63,6 +82,7 @@ export async function addBonusPoints(memberId: number, amount: number, reason: s
 }
 
 export async function deleteMember(memberId: number) {
+  await checkAuth()
   await prisma.$transaction([
     prisma.pointTransaction.deleteMany({
       where: { memberId }
